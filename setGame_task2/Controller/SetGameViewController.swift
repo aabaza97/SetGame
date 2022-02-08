@@ -10,6 +10,8 @@ import UIKit
 class SetGameViewController: UIViewController {
     
     //MARK: -Properties
+    ///
+    var displayMode: DisplayMode!
     
     ///The reuse identifier of the card cell in the cards collectionview.
     private let cardCellId: String = "cardCell"
@@ -39,6 +41,8 @@ class SetGameViewController: UIViewController {
     
     
     //MARK: -Outlets
+    
+    
     @IBOutlet weak var scoreLabel: UILabel!
     
     @IBOutlet weak var matchesCounterLabel: UILabel!
@@ -111,6 +115,12 @@ class SetGameViewController: UIViewController {
     }
 
     
+    //MARK: -Actions
+    @IBAction func dismissControllerButton(_ sender: UIBarButtonItem) {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    
     
     //MARK: -Functions
     
@@ -162,9 +172,18 @@ class SetGameViewController: UIViewController {
 extension SetGameViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.frame.size.width / 3 - (16)
-        let height = width * 13 / 11
-        return CGSize(width: width, height: height)
+        switch self.displayMode {
+        case .textual:
+            let width = collectionView.frame.size.width / 3 - (16)
+            let height = width * 5 / 4
+            return CGSize(width: width, height: height)
+        case .graphical:
+            let width = collectionView.frame.size.width / 3 - (16)
+            let height = width * 5 / 4
+            return CGSize(width: width, height: height)
+        default : return CGSize.zero
+        }
+        
     }
     
 }
@@ -177,8 +196,34 @@ extension SetGameViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        var cell: UICollectionViewCell?
+        
+        switch self.displayMode {
+        case .textual:
+            cell = self.dequeueTextualCardCell(collectionView, cellForItemAt: indexPath)
+            break
+        case .graphical:
+            cell = self.dequeueGraphicalCardCell(collectionView, cellForItemAt: indexPath)
+            break
+        default:
+            break
+        }
+        
+        
+        return cell ?? UICollectionViewCell()
+    }
+    
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        print(self.game.deckCards[indexPath.row].shape)
+//    }
+//
+    func collectionView(_ collectionView: UICollectionView, shouldSpringLoadItemAt indexPath: IndexPath, with context: UISpringLoadedInteractionContext) -> Bool {
+        true
+    }
+
+    private func dequeueTextualCardCell(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell? {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.cardCellId, for: indexPath) as? CardCell
-        else {return UICollectionViewCell()}
+        else {return nil}
         
         //Cell Configuration
         cell.font = self.font
@@ -194,14 +239,18 @@ extension SetGameViewController: UICollectionViewDataSource {
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(self.game.deckCards[indexPath.row].shape)
+    private func dequeueGraphicalCardCell(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell? {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.cardCellId, for: indexPath) as? GraphicalCardCell
+        else {return nil}
+        
+        cell.card = self.game.deckCards[indexPath.item]
+        cell.contentView.backgroundColor = .darkGray
+        cell.contentView.layer.cornerRadius = 12.0
+        cell.contentView.clipsToBounds = true
+        
+        return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, shouldSpringLoadItemAt indexPath: IndexPath, with context: UISpringLoadedInteractionContext) -> Bool {
-        true
-    }
-
 }
 
 
@@ -233,4 +282,12 @@ extension SetGameViewController: GameDelegate {
     func didDeselectCard(_ card: Card, at index: Int) {
         
     }
+}
+
+
+//MARK: -Associated Types
+enum DisplayMode: Codable {
+    case textual
+    case graphical
+    case animated
 }

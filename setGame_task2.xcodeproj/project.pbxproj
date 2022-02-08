@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC3A7CD627A803A800758EE2 /* GameModeSelectorTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3A7CD527A803A800758EE2 /* GameModeSelectorTableViewController.swift */; };
+		AC3A7CD827A963FF00758EE2 /* GraphicsCardButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3A7CD727A963FE00758EE2 /* GraphicsCardButton.swift */; };
 		AC42C97627858275002BDE9E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C97527858275002BDE9E /* AppDelegate.swift */; };
 		AC42C97827858275002BDE9E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C97727858275002BDE9E /* SceneDelegate.swift */; };
 		AC42C97A27858275002BDE9E /* SetGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C97927858275002BDE9E /* SetGameViewController.swift */; };
@@ -17,11 +19,13 @@
 		AC42C99127858628002BDE9E /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C99027858628002BDE9E /* Card.swift */; };
 		AC42C994278588FB002BDE9E /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C993278588FB002BDE9E /* Game.swift */; };
 		AC42C9972785C4CF002BDE9E /* MatchCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C9962785C4CF002BDE9E /* MatchCase.swift */; };
-		AC42C99A2785E80A002BDE9E /* Int+EitherAllOrNone.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C9992785E80A002BDE9E /* Int+EitherAllOrNone.swift */; };
 		AC42C99C27876FDC002BDE9E /* CardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C99B27876FDC002BDE9E /* CardCell.swift */; };
+		ACCE130F27B2CADE00779F67 /* GraphicalCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCE130E27B2CADE00779F67 /* GraphicalCardCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AC3A7CD527A803A800758EE2 /* GameModeSelectorTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModeSelectorTableViewController.swift; sourceTree = "<group>"; };
+		AC3A7CD727A963FE00758EE2 /* GraphicsCardButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphicsCardButton.swift; sourceTree = "<group>"; };
 		AC42C97227858275002BDE9E /* setGame_task2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = setGame_task2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC42C97527858275002BDE9E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AC42C97727858275002BDE9E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -34,8 +38,8 @@
 		AC42C99027858628002BDE9E /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		AC42C993278588FB002BDE9E /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		AC42C9962785C4CF002BDE9E /* MatchCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCase.swift; sourceTree = "<group>"; };
-		AC42C9992785E80A002BDE9E /* Int+EitherAllOrNone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+EitherAllOrNone.swift"; sourceTree = "<group>"; };
 		AC42C99B27876FDC002BDE9E /* CardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCell.swift; sourceTree = "<group>"; };
+		ACCE130E27B2CADE00779F67 /* GraphicalCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphicalCardCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,7 +72,6 @@
 		AC42C97427858275002BDE9E /* setGame_task2 */ = {
 			isa = PBXGroup;
 			children = (
-				AC42C9982785E7EA002BDE9E /* Utils */,
 				AC42C98C2785829E002BDE9E /* View */,
 				AC42C98B27858294002BDE9E /* Controller */,
 				AC42C98A27858290002BDE9E /* Model */,
@@ -96,6 +99,7 @@
 				AC42C99027858628002BDE9E /* Card.swift */,
 				AC42C993278588FB002BDE9E /* Game.swift */,
 				AC42C9962785C4CF002BDE9E /* MatchCase.swift */,
+				ACCE130E27B2CADE00779F67 /* GraphicalCardCell.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -104,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				AC42C97927858275002BDE9E /* SetGameViewController.swift */,
+				AC3A7CD527A803A800758EE2 /* GameModeSelectorTableViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -113,16 +118,9 @@
 			children = (
 				AC42C97B27858275002BDE9E /* Main.storyboard */,
 				AC42C99B27876FDC002BDE9E /* CardCell.swift */,
+				AC3A7CD727A963FE00758EE2 /* GraphicsCardButton.swift */,
 			);
 			path = View;
-			sourceTree = "<group>";
-		};
-		AC42C9982785E7EA002BDE9E /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				AC42C9992785E80A002BDE9E /* Int+EitherAllOrNone.swift */,
-			);
-			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -198,12 +196,14 @@
 			files = (
 				AC42C97A27858275002BDE9E /* SetGameViewController.swift in Sources */,
 				AC42C994278588FB002BDE9E /* Game.swift in Sources */,
+				ACCE130F27B2CADE00779F67 /* GraphicalCardCell.swift in Sources */,
 				AC42C98F278582C6002BDE9E /* CardComponents.swift in Sources */,
 				AC42C99127858628002BDE9E /* Card.swift in Sources */,
 				AC42C97627858275002BDE9E /* AppDelegate.swift in Sources */,
-				AC42C99A2785E80A002BDE9E /* Int+EitherAllOrNone.swift in Sources */,
 				AC42C9972785C4CF002BDE9E /* MatchCase.swift in Sources */,
 				AC42C97827858275002BDE9E /* SceneDelegate.swift in Sources */,
+				AC3A7CD627A803A800758EE2 /* GameModeSelectorTableViewController.swift in Sources */,
+				AC3A7CD827A963FF00758EE2 /* GraphicsCardButton.swift in Sources */,
 				AC42C99C27876FDC002BDE9E /* CardCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
