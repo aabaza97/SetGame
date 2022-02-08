@@ -3,11 +3,14 @@ The second assignment of Stanford's CS193P (iOS Development).
 
 # Screenshots
 ### Using Textual Representation
-Cards here are represented using `NSAttributedString`
+- Cards here are represented using `NSAttributedString`
+
 <img src="https://github.com/aabaza97/SetGame/blob/GameLogic/IMG_1502.PNG" width=35% height=35%>
+
 ### Using Graphical Representation
-Cards here are represented using `UIBezzierPath`
-<img src="https://github.com/aabaza97/SetGame/blob/GameLogic/IMG_002.PNG" width=35% height=35%>
+- Cards here are represented using `UIBezzierPath`
+
+<img src="https://github.com/aabaza97/SetGame/blob/GameLogic/IMG_002.png" width=35% height=35%>
 
 # Game Rule
 All Cards must have either equal components or completely different components.
