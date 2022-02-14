@@ -1,16 +1,20 @@
 # SetGame
 The second assignment of Stanford's CS193P (iOS Development).
 
+# Video
+<img src="https://github.com/aabaza97/SetGame/blob/GameLogic/movie.mov" width=30% height=30%>
+
+
 # Screenshots
 ### Using Textual Representation
 - Cards here are represented using `NSAttributedString`
 
-<img src="https://github.com/aabaza97/SetGame/blob/GameLogic/IMG_1502.PNG" width=35% height=35%>
+<img src="https://github.com/aabaza97/SetGame/blob/GameLogic/IMG_1502.PNG" width=30% height=30%>
 
 ### Using Graphical Representation
 - Cards here are represented using `UIBezzierPath`
 
-<img src="https://github.com/aabaza97/SetGame/blob/GameLogic/IMG_002.png" width=35% height=35%>
+<img src="https://github.com/aabaza97/SetGame/blob/GameLogic/IMG_002.png" width=30% height=30%>
 
 # Game Rule
 All Cards must have either equal components or completely different components.
