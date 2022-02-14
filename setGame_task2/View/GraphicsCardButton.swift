@@ -10,22 +10,22 @@ import UIKit
 class GraphicsCardButton: UIButton {
 
     //MARK: -Properties
-    var card: Card! { didSet { setNeedsDisplay(); setNeedsLayout() } }
+    var card: Card? { didSet { setNeedsDisplay(); setNeedsLayout() } }
     
     var number: Int {
-        self.card.componenets.number.value
+        self.card?.number ?? 0
     }
     
     var shape: CardShape {
-        self.card.componenets.shape
+        self.card?.componenets.shape ?? .diamond
     }
     
     var shade: CardShade {
-        self.card.componenets.shade
+        self.card?.shade ?? .noFill
     }
     
     var color: UIColor {
-        self.card.componenets.color.value
+        self.card?.color ?? .clear
     }
     
     var strokeWidth: CGFloat {
@@ -36,6 +36,7 @@ class GraphicsCardButton: UIButton {
     
     //MARK: -LifeCycle
     override func draw(_ rect: CGRect) {
+        guard self.card != nil else { return }
         var shapePath: UIBezierPath = UIBezierPath()
         
         self.color.setFill()
@@ -98,7 +99,7 @@ class GraphicsCardButton: UIButton {
     
     private func drawDiamond() -> UIBezierPath {
         let shapeSize = CGSize(
-            width: (self.width - (2 * LayoutSpaces.horizontalMargin)) / Constants.maximumShapesNumber,
+            width: (self.width - (2 * LayoutSpaces.horizontalMargin)) / Constants.maximumShapesNumber, 
             height: self.height - (2 * LayoutSpaces.verticalMargin)
         )
         let drawRectWidth = (CGFloat(self.number) * shapeSize.width) + (CGFloat(self.number) * LayoutSpaces.spaceBetweenShapes)
@@ -129,13 +130,16 @@ class GraphicsCardButton: UIButton {
             width: (self.width - (4 * LayoutSpaces.horizontalMargin)) / Constants.maximumShapesNumber,
             height: self.height - (2 * LayoutSpaces.verticalMargin)
         )
-//        if self.shape == .squiggle {
-//            print("Width: \(shapeSize.width), Height: \(shapeSize.height)\n------------------------------")
-//        }
+        
         let drawRectWidth = (CGFloat(self.number) * shapeSize.width) + (CGFloat(self.number) * LayoutSpaces.spaceBetweenShapes) + (2 * LayoutSpaces.horizontalMargin)
         let drawOrigin = CGPoint(x: (self.width - drawRectWidth) / 2, y: LayoutSpaces.verticalMargin)
         let path = UIBezierPath()
         
+        
+        /*
+         NOTE:
+         - (shapeSize.width / 2) yields the center X coordinate of the shape
+         */
         for shapeNumber in 0 ..< self.number {
             let drawX = drawOrigin.x + (shapeSize.width * CGFloat(shapeNumber)) + (LayoutSpaces.spaceBetweenShapes * CGFloat(shapeNumber)) + LayoutSpaces.horizontalMargin
             let drawPoint = CGPoint(x: drawX, y: drawOrigin.y )

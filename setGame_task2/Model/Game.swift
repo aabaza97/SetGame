@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 
 
@@ -56,7 +57,8 @@ class Game {
     
     //MARK: -Inits
     
-    init() {
+    init(in controller: GameDelegate) {
+        self.delegate = controller
         self.newGame()
     }
     
@@ -125,6 +127,7 @@ class Game {
     
     /// Choses a card at a specific index. When 3 cards are selected the matching check is going to get triggered.
     func choseCard(at index: Int) -> Void {
+        guard index < self.deckCards.count else { return }
         var chosenCard = self.deckCards[index]
         
         /*
@@ -135,11 +138,13 @@ class Game {
         
         //1. If card has not been chosen before, add it. Otherwise, remove it
         if !self.chosenCardsForMatching.contains(chosenCard) {
-            chosenCard.markChosen()
+            chosenCard.handleHighlighting()
             self.chosenCardsForMatching.append(chosenCard)
             self.delegate?.didFinishChosingCard(chosenCard, at: index)
         } else {
             guard let indexOfPreviouslyChosenCard = self.chosenCardsForMatching.firstIndex(of: chosenCard) else { return }
+            chosenCard = self.chosenCardsForMatching[indexOfPreviouslyChosenCard]
+            chosenCard.handleHighlighting()
             self.chosenCardsForMatching.remove(at: indexOfPreviouslyChosenCard)
             self.delegate?.didDeselectCard(chosenCard, at: indexOfPreviouslyChosenCard)
         }
@@ -191,16 +196,23 @@ class Game {
         
         self.matchedCards.append(newMatch)
         self.removeMatchedCardsFromTable(of: newMatch)
+        //calls the function responsible for notifying the delegate of the game.
+        self.delegate?.didFinishChosingSet([newMatch.first, newMatch.second, newMatch.third], with: .match)
     }
     
     
     /// Removes the matched tripple from the visible cards on table and clears the chosen cards for matching property.
     private func removeMatchedCardsFromTable(of matchedTripple: Tripple) -> Void {
+        let deckCountBeforeRemoval = self.deckCards.count
         for card in self.deckCards {
             if let indexOfTheCardOnTable = self.deckCards.firstIndex(of: card),
                (card == matchedTripple.first || card == matchedTripple.second || card == matchedTripple.third)
             {
                 self.deckCards.remove(at: indexOfTheCardOnTable)
+            }
+            
+            if (deckCountBeforeRemoval - self.deckCards.count) == 3  {
+                break
             }
         }
         
@@ -217,10 +229,11 @@ class Game {
             self.score += 10
         case .mismatch:
             self.score -= 5
+            self.delegate?.didFinishChosingSet(self.chosenCardsForMatching, with: matchCase)
         }
         
-        //calls the function responsible for notifying the delegate of the game.
-        self.delegate?.didFinishChosingSet(self.chosenCardsForMatching, with: matchCase)
+//        //calls the function responsible for notifying the delegate of the game.
+//        self.delegate?.didFinishChosingSet(self.chosenCardsForMatching, with: matchCase)
     }
     
     

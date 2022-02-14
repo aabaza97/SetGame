@@ -25,20 +25,24 @@ class GameModeSelectorTableViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        guard let nav = self.storyboard?.instantiateViewController(withIdentifier: ControllerConsts.textGameSegueId) as? UINavigationController else { return }
+        guard let vc = nav.viewControllers[0] as? SetGameViewController else { return }
+        nav.modalPresentationStyle = .fullScreen
+        nav.isModalInPresentation = false
+        
         switch indexPath.row {
         case 0:
-            guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "textGame") as? SetGameViewController else { return }
             vc.displayMode = .textual
-            self.navigationController?.pushViewController(vc, animated: true)
             break
         case 1:
-            guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "graphicsGame") as? SetGameViewController else { return }
             vc.displayMode = .graphical
-            self.navigationController?.pushViewController(vc, animated: true)
             break
         case 2: break
         default: return
         }
+        
+        self.present(nav, animated: true)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -59,7 +63,7 @@ class GameModeSelectorTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "menuCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: ControllerConsts.cellReuseId, for: indexPath)
         
         //Cell configuration
         var contentConfiugration = cell.defaultContentConfiguration()
@@ -69,11 +73,23 @@ class GameModeSelectorTableViewController: UITableViewController {
         contentConfiugration.secondaryText = self.menuItems[indexPath.row].subtitle
         
         
-        let accView = UIImageView(image: .init(systemName: "chevron.right"))
+        let accView = UIImageView(image: .init(systemName: ControllerConsts.chevronRightIconName))
         cell.contentConfiguration = contentConfiugration
         cell.accessoryView = accView
         cell.tintColor = .white
         
         return cell
+    }
+}
+
+
+//MARK: -Associated Extensions
+extension GameModeSelectorTableViewController{
+    private struct ControllerConsts {
+        static let cellReuseId: String = "menuCell"
+        static let chevronRightIconName: String = "chevron.right"
+        
+        static let textGameSegueId: String = "textGame"
+        static let graphicsGameSegueId: String = "textGame"
     }
 }

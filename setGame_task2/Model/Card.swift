@@ -46,7 +46,7 @@ struct Card: Equatable {
     }
     
     /// Mutates the selection flag of the card.
-    mutating func markChosen() -> Void {
+    mutating func handleHighlighting() -> Void {
         self.isChosen = !self.isChosen
     }
     

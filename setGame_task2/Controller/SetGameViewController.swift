@@ -13,18 +13,14 @@ class SetGameViewController: UIViewController {
     ///
     var displayMode: DisplayMode!
     
-    ///The reuse identifier of the card cell in the cards collectionview.
-    private let cardCellId: String = "cardCell"
-    
+    ///The game model reference.
     private var game: Game!
     
     private var gameCards: [Card] {
         self.game.gameCards
     }
     
-    private var deckCards: [Card] {
-        self.game.deckCards
-    }
+    private var deckCards: [Card] = []
     
     private var score: Int {
         self.game.score
@@ -41,8 +37,6 @@ class SetGameViewController: UIViewController {
     
     
     //MARK: -Outlets
-    
-    
     @IBOutlet weak var scoreLabel: UILabel!
     
     @IBOutlet weak var matchesCounterLabel: UILabel!
@@ -90,11 +84,11 @@ class SetGameViewController: UIViewController {
     @IBOutlet weak var cardsCollectionView: UICollectionView! {
         didSet {
             // layout configuration
-            let layout = UICollectionViewFlowLayout()
+            let layout = CardsLayout()
             layout.scrollDirection = .vertical
-            layout.sectionInset = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
-            layout.minimumInteritemSpacing = 0
-            layout.minimumLineSpacing = 8.0
+            layout.sectionInset = CollectionViewConsts.sectionSpacing
+            layout.minimumInteritemSpacing = CollectionViewConsts.minimumInteritemSpacing
+            layout.minimumLineSpacing = CollectionViewConsts.minimumLineSpacing
             
             // functionality configuration
             cardsCollectionView.collectionViewLayout = layout
@@ -102,7 +96,7 @@ class SetGameViewController: UIViewController {
             cardsCollectionView.dataSource = self
             
             // view configuration
-            cardsCollectionView.layer.cornerRadius = 12.0
+            cardsCollectionView.layer.cornerRadius = CollectionViewConsts.cornerRadius
             cardsCollectionView.clipsToBounds = true
         }
     }
@@ -118,6 +112,7 @@ class SetGameViewController: UIViewController {
     //MARK: -Actions
     @IBAction func dismissControllerButton(_ sender: UIBarButtonItem) {
         self.navigationController?.popViewController(animated: true)
+        self.navigationController?.dismiss(animated: true)
     }
     
     
@@ -126,8 +121,7 @@ class SetGameViewController: UIViewController {
     
     ///Configures the controller.
     private func configure() -> Void {
-        self.game = Game()
-        self.game.delegate = self
+        self.game = Game(in: self)
     }
     
     
@@ -137,7 +131,7 @@ class SetGameViewController: UIViewController {
         var color: UIColor
         let impact =  UINotificationFeedbackGenerator()
         
-        
+        //Handling Impact Feedback generator...
         switch matchCase {
         case .match:
             color = .green
@@ -163,29 +157,20 @@ class SetGameViewController: UIViewController {
         }
 
     }
-
+    
 }
 
 
 
 //MARK: - CollectionView Delegate
 extension SetGameViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
-
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        switch self.displayMode {
-        case .textual:
-            let width = collectionView.frame.size.width / 3 - (16)
-            let height = width * 5 / 4
-            return CGSize(width: width, height: height)
-        case .graphical:
-            let width = collectionView.frame.size.width / 3 - (16)
-            let height = width * 5 / 4
-            return CGSize(width: width, height: height)
-        default : return CGSize.zero
-        }
+        let collectionViewWidth = collectionView.frame.width
+        let itemWidth = (collectionViewWidth / CollectionViewConsts.numberOfItemsInRow) - (2 * CollectionViewConsts.horizontalMargin)
+        let itemHeight = itemWidth * SizeRatios.itemHeightToItemWidth
         
+        return CGSize(width: itemWidth, height: itemHeight)
     }
-    
 }
 
 
@@ -196,61 +181,26 @@ extension SetGameViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        var cell: UICollectionViewCell?
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ControllerConsts.cardCellId, for: indexPath) as? CardCell
+        else {return UICollectionViewCell()}
+        let cellCard = self.deckCards[indexPath.item]
         
-        switch self.displayMode {
-        case .textual:
-            cell = self.dequeueTextualCardCell(collectionView, cellForItemAt: indexPath)
-            break
-        case .graphical:
-            cell = self.dequeueGraphicalCardCell(collectionView, cellForItemAt: indexPath)
-            break
-        default:
-            break
-        }
-        
-        
-        return cell ?? UICollectionViewCell()
-    }
-    
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        print(self.game.deckCards[indexPath.row].shape)
-//    }
-//
-    func collectionView(_ collectionView: UICollectionView, shouldSpringLoadItemAt indexPath: IndexPath, with context: UISpringLoadedInteractionContext) -> Bool {
-        true
-    }
-
-    private func dequeueTextualCardCell(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell? {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.cardCellId, for: indexPath) as? CardCell
-        else {return nil}
-        
-        //Cell Configuration
+        //Cell configuration
+        cell.displayMode = self.displayMode
         cell.font = self.font
-        cell.card = self.game.deckCards[indexPath.item]
+        cell.card = cellCard
         cell.contentView.backgroundColor = .darkGray
-        cell.contentView.layer.cornerRadius = 12.0
+        cell.contentView.layer.cornerRadius = CollectionViewConsts.cornerRadius
         cell.contentView.clipsToBounds = true
         
         cell.actionForChosingCard = {
             self.game.choseCard(at: indexPath.item)
+            cell.contentView.backgroundColor = cell.card.isChosen ? .yellow.withAlphaComponent(0.3) : .darkGray
         }
         
-        return cell
-    }
-    
-    private func dequeueGraphicalCardCell(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell? {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.cardCellId, for: indexPath) as? GraphicalCardCell
-        else {return nil}
-        
-        cell.card = self.game.deckCards[indexPath.item]
-        cell.contentView.backgroundColor = .darkGray
-        cell.contentView.layer.cornerRadius = 12.0
-        cell.contentView.clipsToBounds = true
         
         return cell
     }
-    
 }
 
 
@@ -258,29 +208,58 @@ extension SetGameViewController: UICollectionViewDataSource {
 extension SetGameViewController: GameDelegate {
     func didFinishChosingSet(_ chosenSet: [Card], with matchCase: MatchCase) {
         self.updateScore(for: matchCase)
+        
+        guard matchCase == .match else { return }
+        
         self.matchesCounterLabel.text = "Matched: \(self.matchesCount)"
-        self.cardsCollectionView.reloadData()
+        
+        self.cardsCollectionView.performBatchUpdates {
+            var indecies = [IndexPath]()
+            for card in chosenSet {
+                guard let indexOfChosenCardInDeck = self.deckCards.firstIndex(of: card) else { return }
+                indecies.append(IndexPath(item: indexOfChosenCardInDeck, section: 0))
+            }
+            self.cardsCollectionView.deleteItems(at: indecies)
+            self.deckCards = self.game.deckCards
+        } completion: { [weak self]done in
+            guard done, let self = self else { return }
+            self.cardsCollectionView.reloadData()
+        }
     }
     
     func didFinishDealingCards(_ dealtCards: [Card]?, withError error: SetGameError?) {
-        guard error == nil else {
+        guard let cards = dealtCards, error == nil else {
             let alert = UIAlertController(title: "What the heck!", message: "5alas dol el 2wel ya ro7 Omak ;p", preferredStyle: .alert)
             let alertAction = UIAlertAction(title: "7ader", style: .default, handler: nil)
             alert.addAction(alertAction)
             self.present(alert, animated: true)
             return
         }
-        self.cardsCollectionView.reloadData()
+        
+        for i in 0 ..< cards.count {
+            Timer.scheduledTimer(withTimeInterval: Double(i) * ControllerConsts.intervalMultiplier, repeats: false) { _ in
+                self.deckCards.append(cards[i])
+                let indexPathOfCardToAdd = IndexPath(item: self.deckCards.count - 1, section: 0)
+                self.cardsCollectionView.insertItems(at: [indexPathOfCardToAdd])
+                
+                let isLastItemToAdd = i == cards.count - 1 ? true : false
+                if isLastItemToAdd {
+                    self.cardsCollectionView.scrollToItem(at: indexPathOfCardToAdd, at: .top, animated: true)
+                }
+            }
+        }
     }
     
     func didFinishChosingCard(_ card: Card, at index: Int) {
         let indexPath = IndexPath(item: index, section: 0)
         let cardCell = self.cardsCollectionView.cellForItem(at: indexPath) as? CardCell
-        cardCell?.card.markChosen()
+        cardCell?.card.handleHighlighting()
     }
     
     func didDeselectCard(_ card: Card, at index: Int) {
-        
+        let indexPath = IndexPath(item: index, section: 0)
+        let cardCell = self.cardsCollectionView.cellForItem(at: indexPath) as? CardCell
+        cardCell?.card.handleHighlighting()
     }
 }
 
@@ -289,5 +268,27 @@ extension SetGameViewController: GameDelegate {
 enum DisplayMode: Codable {
     case textual
     case graphical
-    case animated
+}
+
+
+//MARK: -Associated Extensions
+extension SetGameViewController {
+    private struct CollectionViewConsts {
+        static let sectionSpacing: UIEdgeInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+        static let minimumInteritemSpacing: CGFloat = 0
+        static let minimumLineSpacing: CGFloat = 8.0
+        static let cornerRadius: CGFloat = 12.0
+        static let numberOfItemsInRow: CGFloat = 3.0
+        static let horizontalMargin: CGFloat = 8.0
+    }
+    
+    private struct SizeRatios {
+        static let itemHeightToItemWidth: CGFloat = 5 / 4
+    }
+    
+    private struct ControllerConsts {
+        ///The reuse identifier of the card cell in the cards collectionview.
+        static let cardCellId: String = "cardCell"
+        static let intervalMultiplier: Double = 0.154
+    }
 }

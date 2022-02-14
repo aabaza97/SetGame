@@ -21,6 +21,7 @@
 		AC42C9972785C4CF002BDE9E /* MatchCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C9962785C4CF002BDE9E /* MatchCase.swift */; };
 		AC42C99C27876FDC002BDE9E /* CardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC42C99B27876FDC002BDE9E /* CardCell.swift */; };
 		ACCE130F27B2CADE00779F67 /* GraphicalCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCE130E27B2CADE00779F67 /* GraphicalCardCell.swift */; };
+		ACFF90AB27B99D2100899A9C /* CardsLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACFF90AA27B99D2000899A9C /* CardsLayout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		AC42C9962785C4CF002BDE9E /* MatchCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCase.swift; sourceTree = "<group>"; };
 		AC42C99B27876FDC002BDE9E /* CardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCell.swift; sourceTree = "<group>"; };
 		ACCE130E27B2CADE00779F67 /* GraphicalCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphicalCardCell.swift; sourceTree = "<group>"; };
+		ACFF90AA27B99D2000899A9C /* CardsLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardsLayout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,7 +101,6 @@
 				AC42C99027858628002BDE9E /* Card.swift */,
 				AC42C993278588FB002BDE9E /* Game.swift */,
 				AC42C9962785C4CF002BDE9E /* MatchCase.swift */,
-				ACCE130E27B2CADE00779F67 /* GraphicalCardCell.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -116,11 +117,21 @@
 		AC42C98C2785829E002BDE9E /* View */ = {
 			isa = PBXGroup;
 			children = (
+				ACFF90A927B99CF900899A9C /* Layouts */,
 				AC42C97B27858275002BDE9E /* Main.storyboard */,
 				AC42C99B27876FDC002BDE9E /* CardCell.swift */,
+				ACCE130E27B2CADE00779F67 /* GraphicalCardCell.swift */,
 				AC3A7CD727A963FE00758EE2 /* GraphicsCardButton.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		ACFF90A927B99CF900899A9C /* Layouts */ = {
+			isa = PBXGroup;
+			children = (
+				ACFF90AA27B99D2000899A9C /* CardsLayout.swift */,
+			);
+			path = Layouts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -201,6 +212,7 @@
 				AC42C99127858628002BDE9E /* Card.swift in Sources */,
 				AC42C97627858275002BDE9E /* AppDelegate.swift in Sources */,
 				AC42C9972785C4CF002BDE9E /* MatchCase.swift in Sources */,
+				ACFF90AB27B99D2100899A9C /* CardsLayout.swift in Sources */,
 				AC42C97827858275002BDE9E /* SceneDelegate.swift in Sources */,
 				AC3A7CD627A803A800758EE2 /* GameModeSelectorTableViewController.swift in Sources */,
 				AC3A7CD827A963FF00758EE2 /* GraphicsCardButton.swift in Sources */,
