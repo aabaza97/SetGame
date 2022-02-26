@@ -19,7 +19,7 @@ typealias Quad = (Int, Int, Int, Int)
 class Game {
     //MARK: -Properties
     ///The maximum amount of cards to be dealt on deck at a time.
-    private let maximumNumberOfCardsOnTable: Int = 24
+    private let maximumNumberOfCardsOnTable: Int = 81
     
     /// All cards generated at the biginning of the game, the ones on deck and those to be dealt later in game.
     private(set) var gameCards: [Card] = []
@@ -38,8 +38,11 @@ class Game {
     /// The selected cards
     private(set) var chosenCardsForMatching = [Card]() {
         didSet {
+            
             if chosenCardsForMatching.count == 3 {
                 self.checkChosenCardsMatchStatus()
+            } else {
+                self.previousMatchCase = nil
             }
         }
     }
@@ -50,6 +53,9 @@ class Game {
             if score < 0 { score = 0 }
         }
     }
+    
+    
+    private(set) var previousMatchCase: MatchCase?
     
     ///The game delegate corresponding to game events.
     weak var delegate: GameDelegate?
@@ -72,6 +78,7 @@ class Game {
         self.chosenCardsForMatching.removeAll()
         self.deckCards.removeAll()
         self.matchedCards.removeAll()
+        self.previousMatchCase = nil
         
         // Generate cards.
         self.generateCards()
@@ -140,7 +147,7 @@ class Game {
         if !self.chosenCardsForMatching.contains(chosenCard) {
             chosenCard.handleHighlighting()
             self.chosenCardsForMatching.append(chosenCard)
-            self.delegate?.didFinishChosingCard(chosenCard, at: index)
+            self.delegate?.didFinishChosingCard(chosenCard, at: index, with: self.previousMatchCase)
         } else {
             guard let indexOfPreviouslyChosenCard = self.chosenCardsForMatching.firstIndex(of: chosenCard) else { return }
             chosenCard = self.chosenCardsForMatching[indexOfPreviouslyChosenCard]
@@ -170,19 +177,20 @@ class Game {
             - Matching handler gets triggered.
          */
         
-        let groupedByNumber = Dictionary(grouping: self.chosenCardsForMatching, by: {$0.componenets.number}).count.eitherAllOrNone
+        let eitherSimilarNumbersOrDifferent = self.chosenCardsForMatching.countGroupedBy(.number).eitherAllOrNone
         
-        let groupedByShape = Dictionary(grouping: self.chosenCardsForMatching, by: {$0.componenets.shape}).count.eitherAllOrNone
+        let eitherSimilarShapesOrDifferent = self.chosenCardsForMatching.countGroupedBy(.shape).eitherAllOrNone
         
-        let groupedByShade = Dictionary(grouping: self.chosenCardsForMatching, by: {$0.componenets.shade}).count.eitherAllOrNone
+        let eitherSimilarShadesOrDifferent = self.chosenCardsForMatching.countGroupedBy(.shade).eitherAllOrNone
         
-        let groupedByColor = Dictionary(grouping: self.chosenCardsForMatching, by: {$0.componenets.color}).count.eitherAllOrNone
+        let eitherSimilarColorsOrDifferent = self.chosenCardsForMatching.countGroupedBy(.color).eitherAllOrNone
         
         
         
-        guard groupedByNumber, groupedByShade, groupedByColor, groupedByShape else {
+        guard eitherSimilarNumbersOrDifferent, eitherSimilarShadesOrDifferent, eitherSimilarColorsOrDifferent, eitherSimilarShapesOrDifferent else {
             //TODO: clear selection...
             self.handleMatching(for: .mismatch)
+            self.previousMatchCase = .mismatch
             self.chosenCardsForMatching.removeAll()
             return
         }
@@ -196,6 +204,7 @@ class Game {
         
         self.matchedCards.append(newMatch)
         self.removeMatchedCardsFromTable(of: newMatch)
+        self.previousMatchCase = nil
         //calls the function responsible for notifying the delegate of the game.
         self.delegate?.didFinishChosingSet([newMatch.first, newMatch.second, newMatch.third], with: .match)
     }
@@ -259,7 +268,7 @@ protocol GameDelegate: AnyObject {
     func didFinishDealingCards(_ dealtCards: [Card]?, withError error: SetGameError?) -> Void
     
     ///Notifies the delegate when a card is chosen.
-    func didFinishChosingCard(_ card: Card, at index: Int) -> Void
+    func didFinishChosingCard(_ card: Card, at index: Int, with previousMatchCase: MatchCase?) -> Void
     
     ///Notifies the delegate when a card is deselected.
     func didDeselectCard(_ card: Card, at index: Int) -> Void
@@ -271,4 +280,27 @@ protocol GameDelegate: AnyObject {
 enum SetGameError: Error {
     case ReachedMaximumAmountOfCardsOnDeck
     case NoMoreCardsToDeal
+}
+
+extension Sequence where Iterator.Element == Card {
+    func countGroupedBy(_ cardComponent: CardComponent) -> Int {
+        switch cardComponent {
+        case .number:
+            return Dictionary(grouping: self, by: { $0.componenets.number }).count
+        case .color:
+            return Dictionary(grouping: self, by: { $0.componenets.color }).count
+        case .shape:
+            return Dictionary(grouping: self, by: { $0.componenets.shape }).count
+        case .shade:
+            return Dictionary(grouping: self, by: { $0.componenets.shade }).count
+        }
+    }
+}
+
+
+enum CardComponent {
+    case number
+    case color
+    case shape
+    case shade
 }

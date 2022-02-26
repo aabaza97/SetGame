@@ -22,6 +22,8 @@ class SetGameViewController: UIViewController {
     
     private var deckCards: [Card] = []
     
+    private var lastMismatch: [Card] = []
+    
     private var score: Int {
         self.game.score
     }
@@ -29,6 +31,7 @@ class SetGameViewController: UIViewController {
     private var matchesCount: Int {
         self.game.matchedCards.count
     }
+    
     
     ///Adjusts the font to the accessibility settings accordingly.
     private var font: UIFont {
@@ -45,16 +48,7 @@ class SetGameViewController: UIViewController {
     @IBOutlet weak var dealCardsButton: UIButton! {
         didSet {
             let action = UIAction { [weak self]_ in
-                let alert = UIAlertController(title: "Deal 3 cards", message: "Three cards will be added to the deck. Are you sure?", preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
-                    self?.game.dealCards()
-                }
-                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-                
-                alert.addAction(okAction)
-                alert.addAction(cancelAction)
-                
-                self?.present(alert, animated: true, completion: nil)
+                self?.game.dealCards()
             }
             
             dealCardsButton.addAction(action, for: .touchUpInside)
@@ -66,8 +60,9 @@ class SetGameViewController: UIViewController {
             let action = UIAction { [weak self] _ in
                 let alert = UIAlertController(title: "New game", message: "Do you want to create a new game? Any progress you have done so far will be lost.", preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
-                    self?.game.newGame()
+                    self?.deckCards.removeAll()
                     self?.cardsCollectionView.reloadData()
+                    self?.game.newGame()
                 }
                 let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
                 
@@ -206,11 +201,28 @@ extension SetGameViewController: UICollectionViewDataSource {
 
 //MARK: -Game Delegate
 extension SetGameViewController: GameDelegate {
+    
     func didFinishChosingSet(_ chosenSet: [Card], with matchCase: MatchCase) {
         self.updateScore(for: matchCase)
         
+        if matchCase == .mismatch {
+            //deselects the wrong chosen cards
+            var cellIndecies = [IndexPath]()
+            chosenSet.forEach { card in
+                guard let indexOfCardOnDeck = self.deckCards.firstIndex(of: card) else { return }
+                cellIndecies.append(IndexPath(item: indexOfCardOnDeck, section: 0))
+            }
+            
+            cellIndecies.forEach { indexPath in
+                let cell = self.cardsCollectionView.cellForItem(at: indexPath) as? CardCell
+                cell?.card.handleHighlighting()
+            }
+            self.cardsCollectionView.reloadData()
+        }
+        
         guard matchCase == .match else { return }
         
+        self.lastMismatch.removeAll()
         self.matchesCounterLabel.text = "Matched: \(self.matchesCount)"
         
         self.cardsCollectionView.performBatchUpdates {
@@ -221,7 +233,7 @@ extension SetGameViewController: GameDelegate {
             }
             self.cardsCollectionView.deleteItems(at: indecies)
             self.deckCards = self.game.deckCards
-        } completion: { [weak self]done in
+        } completion: { [weak self] done in
             guard done, let self = self else { return }
             self.cardsCollectionView.reloadData()
         }
@@ -229,7 +241,7 @@ extension SetGameViewController: GameDelegate {
     
     func didFinishDealingCards(_ dealtCards: [Card]?, withError error: SetGameError?) {
         guard let cards = dealtCards, error == nil else {
-            let alert = UIAlertController(title: "What the heck!", message: "5alas dol el 2wel ya ro7 Omak ;p", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Full Deck", message: "No more cards to deal. Enjoy solving your mess...", preferredStyle: .alert)
             let alertAction = UIAlertAction(title: "7ader", style: .default, handler: nil)
             alert.addAction(alertAction)
             self.present(alert, animated: true)
@@ -250,7 +262,7 @@ extension SetGameViewController: GameDelegate {
         }
     }
     
-    func didFinishChosingCard(_ card: Card, at index: Int) {
+    func didFinishChosingCard(_ card: Card, at index: Int, with previousMatchCase: MatchCase?) {
         let indexPath = IndexPath(item: index, section: 0)
         let cardCell = self.cardsCollectionView.cellForItem(at: indexPath) as? CardCell
         cardCell?.card.handleHighlighting()
