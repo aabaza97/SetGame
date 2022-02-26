@@ -32,6 +32,10 @@ class SetGameViewController: UIViewController {
         self.game.matchedCards.count
     }
     
+    private var animates: Bool {
+        UserDefaults.standard.bool(forKey: "animates")
+    }
+    
     
     ///Adjusts the font to the accessibility settings accordingly.
     private var font: UIFont {
@@ -225,16 +229,20 @@ extension SetGameViewController: GameDelegate {
         self.lastMismatch.removeAll()
         self.matchesCounterLabel.text = "Matched: \(self.matchesCount)"
         
-        self.cardsCollectionView.performBatchUpdates {
-            var indecies = [IndexPath]()
-            for card in chosenSet {
-                guard let indexOfChosenCardInDeck = self.deckCards.firstIndex(of: card) else { return }
-                indecies.append(IndexPath(item: indexOfChosenCardInDeck, section: 0))
+        if self.animates {
+            self.cardsCollectionView.performBatchUpdates {
+                var indecies = [IndexPath]()
+                for card in chosenSet {
+                    guard let indexOfChosenCardInDeck = self.deckCards.firstIndex(of: card) else { return }
+                    indecies.append(IndexPath(item: indexOfChosenCardInDeck, section: 0))
+                }
+                self.cardsCollectionView.deleteItems(at: indecies)
+                self.deckCards = self.game.deckCards
+            } completion: { [weak self] done in
+                guard done, let self = self else { return }
+                self.cardsCollectionView.reloadData()
             }
-            self.cardsCollectionView.deleteItems(at: indecies)
-            self.deckCards = self.game.deckCards
-        } completion: { [weak self] done in
-            guard done, let self = self else { return }
+        } else {
             self.cardsCollectionView.reloadData()
         }
     }
@@ -248,17 +256,22 @@ extension SetGameViewController: GameDelegate {
             return
         }
         
-        for i in 0 ..< cards.count {
-            Timer.scheduledTimer(withTimeInterval: Double(i) * ControllerConsts.intervalMultiplier, repeats: false) { _ in
-                self.deckCards.append(cards[i])
-                let indexPathOfCardToAdd = IndexPath(item: self.deckCards.count - 1, section: 0)
-                self.cardsCollectionView.insertItems(at: [indexPathOfCardToAdd])
-                
-                let isLastItemToAdd = i == cards.count - 1 ? true : false
-                if isLastItemToAdd {
-                    self.cardsCollectionView.scrollToItem(at: indexPathOfCardToAdd, at: .top, animated: true)
+        if self.animates {
+            for i in 0 ..< cards.count {
+                Timer.scheduledTimer(withTimeInterval: Double(i) * ControllerConsts.intervalMultiplier, repeats: false) { _ in
+                    self.deckCards.append(cards[i])
+                    let indexPathOfCardToAdd = IndexPath(item: self.deckCards.count - 1, section: 0)
+                    self.cardsCollectionView.insertItems(at: [indexPathOfCardToAdd])
+                    
+                    let isLastItemToAdd = i == cards.count - 1 ? true : false
+                    if isLastItemToAdd {
+                        self.cardsCollectionView.scrollToItem(at: indexPathOfCardToAdd, at: .top, animated: true)
+                    }
                 }
             }
+        } else {
+            self.deckCards = cards
+            self.cardsCollectionView.reloadData()
         }
     }
     

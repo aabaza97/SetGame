@@ -8,15 +8,22 @@
 import UIKit
 
 class CardsLayout: UICollectionViewFlowLayout {
+    
+    private var animates: Bool {
+        UserDefaults.standard.bool(forKey: "animates")
+    }
+    
     override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         let attrs = super.initialLayoutAttributesForAppearingItem(at: itemIndexPath)
 
-        guard let collectionView = self.collectionView else { return attrs }
-        let translationDirection = Translations.fromLeft(of: collectionView).coordinates
-        let _ = CGAffineTransform(translationX: translationDirection.x, y: translationDirection.y)
-        let scaleTransform = CGAffineTransform(scaleX: 0.1, y: 0.1)
-        
-        attrs?.transform = scaleTransform
+        if animates {
+            guard let collectionView = self.collectionView else { return attrs }
+            let translationDirection = Translations.fromLeft(of: collectionView).coordinates
+            let _ = CGAffineTransform(translationX: translationDirection.x, y: translationDirection.y)
+            let scaleTransform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+            
+            attrs?.transform = scaleTransform
+        }
         
         return attrs
     }
@@ -25,12 +32,14 @@ class CardsLayout: UICollectionViewFlowLayout {
     override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         let attrs = super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
         
-        guard let collectionView = self.collectionView else { return attrs }
-        let translationDirection = Translations.toRight(of: collectionView).coordinates
-        let _ = CGAffineTransform(translationX: translationDirection.x, y: translationDirection.y)
-        let scaleTransform = CGAffineTransform(scaleX: 0.1, y: 0.1)
-        
-        attrs?.transform = scaleTransform
+        if animates {
+            guard let collectionView = self.collectionView else { return attrs }
+            let translationDirection = Translations.toRight(of: collectionView).coordinates
+            let _ = CGAffineTransform(translationX: translationDirection.x, y: translationDirection.y)
+            let scaleTransform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+            
+            attrs?.transform = scaleTransform
+        } 
         
         return attrs
     }

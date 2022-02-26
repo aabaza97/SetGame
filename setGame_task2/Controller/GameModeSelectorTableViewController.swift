@@ -13,19 +13,46 @@ class GameModeSelectorTableViewController: UITableViewController {
     private let menuItems: [MenuItem] = [
         (title: "Textual Set", subtitle: "Cards represented using text"),
         (title: "Graphical Set", subtitle: "Cards represented using graphics"),
-        (title: "Animated Set",subtitle: "Cards represented interactively")
     ]
     
+    private let settingsItems: [MenuItem] = [
+        (title: "Animate Cards", subtitle: "Lays the cards on the screen interactivly."),
+    ]
     
+    private let animationSwitch = UISwitch()
+    
+    
+    private let defaults = UserDefaults.standard
     
     // MARK: -Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.loadSettings()
+        self.configureActions()
     }
 
     
+    private func loadSettings() -> Void {
+        if let animates = self.defaults.value(forKey: ControllerConsts.animationSettingId) as? Bool {
+            self.animationSwitch.isOn = animates
+        } else {
+            self.defaults.set(true, forKey: ControllerConsts.animationSettingId)
+            self.animationSwitch.isOn = true
+        }
+    }
+    
+    private func configureActions() -> Void {
+        //animation switch control action...
+        self.animationSwitch.addAction(UIAction(handler: { _ in
+            self.defaults.set(self.animationSwitch.isOn, forKey: ControllerConsts.animationSettingId)
+        }), for: .valueChanged)
+    }
+    
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        guard indexPath.section == 0 else { return }
+        
         guard let nav = self.storyboard?.instantiateViewController(withIdentifier: ControllerConsts.textGameSegueId) as? UINavigationController else { return }
         guard let vc = nav.viewControllers[0] as? SetGameViewController else { return }
         nav.modalPresentationStyle = .fullScreen
@@ -46,11 +73,11 @@ class GameModeSelectorTableViewController: UITableViewController {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        1
+        2
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        "Display Modes"
+        return section == 0 ?  "Display Modes" : "Settings"
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -59,7 +86,7 @@ class GameModeSelectorTableViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.menuItems.count
+        return section == 0 ?  self.menuItems.count : 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -67,16 +94,27 @@ class GameModeSelectorTableViewController: UITableViewController {
         
         //Cell configuration
         var contentConfiugration = cell.defaultContentConfiguration()
+        
         contentConfiugration.textProperties.color = .white
         contentConfiugration.secondaryTextProperties.color = .white
-        contentConfiugration.text = self.menuItems[indexPath.row].title
-        contentConfiugration.secondaryText = self.menuItems[indexPath.row].subtitle
         
+        if indexPath.section == 0 {
+            contentConfiugration.text = self.menuItems[indexPath.row].title
+            contentConfiugration.secondaryText = self.menuItems[indexPath.row].subtitle
+            
+            let accView = UIImageView(image: .init(systemName: ControllerConsts.chevronRightIconName))
+            
+            cell.accessoryView = accView
+            cell.tintColor = .white
+        } else if indexPath.section == 1 {
+            contentConfiugration.text = self.settingsItems[0].title
+            contentConfiugration.secondaryText = self.settingsItems[0].subtitle
+            
+            cell.accessoryView = self.animationSwitch
+        }
         
-        let accView = UIImageView(image: .init(systemName: ControllerConsts.chevronRightIconName))
-        cell.contentConfiguration = contentConfiugration
-        cell.accessoryView = accView
         cell.tintColor = .white
+        cell.contentConfiguration = contentConfiugration
         
         return cell
     }
@@ -91,5 +129,7 @@ extension GameModeSelectorTableViewController{
         
         static let textGameSegueId: String = "textGame"
         static let graphicsGameSegueId: String = "textGame"
+        
+        static let animationSettingId: String = "animates"
     }
 }
