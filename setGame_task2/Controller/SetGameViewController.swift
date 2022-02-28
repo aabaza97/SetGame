@@ -270,7 +270,7 @@ extension SetGameViewController: GameDelegate {
                 }
             }
         } else {
-            self.deckCards = cards
+            self.deckCards += cards
             self.cardsCollectionView.reloadData()
         }
     }
